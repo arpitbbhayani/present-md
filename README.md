@@ -1,36 +1,92 @@
-# present
+# present-md
 
-Browser-based Markdown slide presentations for developers.
-
-Write slides in Markdown, serve them locally, present from your browser.
+Write slides in Markdown, run locally, present clean - built for engineers who hate slide tools.
 
 ![Slide showing a code-heavy presentation with syntax highlighting](examples/image.png)
-
-## Installation
-
-```bash
-npm install -g @arpitbbhayani/present
-```
 
 ## Usage
 
 ```bash
-present slides.md            # serve on :7890, auto-open browser
-present slides.md -p 3000    # custom port
-present slides.md --no-open  # serve only, print URL
-present slides.md --pdf      # export to PDF
+npx present-md slides.md            # serve on :7890, auto-open browser
+npx present-md slides.md -p 3000    # custom port
+npx present-md slides.md --no-open  # serve only, print URL
+npx present-md slides.md --pdf      # export to PDF
 ```
 
-## Image placement syntax
+## Writing slides
 
-Images use the title attribute (the quoted string after the URL):
+Each slide is a block of Markdown separated by `---` on its own line:
 
 ```markdown
-![alt](image.png "right")              # right half, content goes left
-![alt](image.png "left opacity:0.8")   # left half with 80% opacity
-![alt](image.png "bg opacity:0.3")     # fullscreen background, 30% opacity
-![alt](image.png)                      # inline (default)
+# First slide
+
+Some content here.
+
+---
+
+## Second slide
+
+More content.
+
+---
+
+# Thank you
 ```
+
+The first `#` heading in the file is used as the browser tab title.
+
+### Text and formatting
+
+Standard Markdown works everywhere — headings, bold, italic, inline code, blockquotes, tables, and lists:
+
+```markdown
+## My slide
+
+> "Good programmers write code that humans can understand." — *Martin Fowler*
+
+- Point one with **bold** and `inline code`
+- Point two with *italic*
+
+| Column A | Column B |
+|----------|----------|
+| foo      | bar      |
+```
+
+### Code blocks
+
+Fenced code blocks get full syntax highlighting:
+
+````markdown
+```typescript
+function parseSlides(markdown: string): Slide[] {
+  return markdown
+    .split(/\n---\n/)
+    .filter(Boolean)
+    .map(raw => processSlide(raw));
+}
+```
+````
+
+### Image placement
+
+Images are positioned using the title attribute (the quoted string after the URL):
+
+```markdown
+![alt](image.png "right")              # image on right half, content on left
+![alt](image.png "left")               # image on left half, content on right
+![alt](image.png "bg")                 # fullscreen background behind content
+![alt](image.png "right opacity:0.8")  # combine position with opacity (0.0–1.0)
+![alt](image.png)                      # inline, default flow
+```
+
+| Directive    | Effect                        |
+| ------------ | ----------------------------- |
+| `right`      | Image fills the right half    |
+| `left`       | Image fills the left half     |
+| `bg`         | Fullscreen background         |
+| `opacity:N`  | Transparency, 0.0 – 1.0       |
+
+`bg` works well for title slides and section dividers — the text sits on top with full readability.
 
 ## Keyboard shortcuts
 
@@ -60,18 +116,3 @@ See `examples/` for sample slide decks:
 
 - `examples/example-1.md` — feature walkthrough
 - `examples/example-2.md` — real-world talk: databases and agentic AI
-
-## Project layout
-
-```
-present/
-├── src/
-│   ├── index.ts      # CLI entry point + HTTP server
-│   ├── parser.ts     # Markdown → slides with image extraction
-│   └── generate.ts   # Slides → self-contained HTML presentation
-├── examples/
-│   ├── example-1.md
-│   └── example-2.md
-├── package.json
-└── tsconfig.json
-```

@@ -1,16 +1,6 @@
 # Publishing to npm
 
-This package is published as `@arpitbbhayani/present` on npm.
-
-## Semantic versioning
-
-Versions follow `MAJOR.MINOR.PATCH`:
-
-- `PATCH` — backwards-compatible bug fixes
-- `MINOR` — new backwards-compatible functionality
-- `MAJOR` — breaking changes (CLI flags removed/renamed, output format changed, Node version floor raised)
-
-Current version is in `package.json` under the `"version"` field.
+This package is published as `present-md` on npm.
 
 ## Pre-publish checklist
 
@@ -52,13 +42,21 @@ npm publish --access public
 ## Verifying the release
 
 ```bash
-npm info @arpitbbhayani/present
+npm info present-md
 ```
 
 Check that the `version` field and `dist-tags.latest` match what you just published.
 
+## Running without installation
+
+```bash
+npx present-md slides.md
+```
+
+`npx` downloads and runs the package on the fly — no global install needed.
+
 ## Installing the published package
 
 ```bash
-npm install -g @arpitbbhayani/present
+npm install -g present-md
 ```

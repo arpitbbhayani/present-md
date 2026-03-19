@@ -1,11 +1,14 @@
 {
-  "name": "present",
+  "name": "present-md",
   "version": "1.0.1",
   "description": "Browser-based markdown presentations for developers",
   "type": "module",
   "bin": {
-    "present": "./dist/index.js"
+    "present-md": "./dist/index.js"
   },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
     "dev": "npx ts-node --esm src/index.ts"
