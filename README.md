@@ -11,10 +11,12 @@ present slides.md --no-open  # serve only, print URL
 
 Images use the title attribute (the quoted string after the URL):
 
+```
 ![alt](image.png "right")              # right half, content goes left
 ![alt](image.png "left opacity:0.8")   # left half with 80% opacity
 ![alt](image.png "bg opacity:0.3")     # fullscreen background, 30% opacity
 ![alt](image.png)                      # inline (default)
+```
 
 ## Features
 

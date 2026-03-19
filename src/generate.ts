@@ -497,6 +497,28 @@ html, body {
 
 #kbd-hint.hidden { opacity: 0; }
 
+/* ── Blinking cursor ──────────────────────────────────────────────────── */
+#cursor {
+  position: fixed;
+  top: 4rem;
+  right: 6rem;
+  width: 2px;
+  height: clamp(2rem, 4.5vw, 3.4rem);
+  background: var(--mauve);
+  z-index: 100;
+  pointer-events: none;
+  animation: cursor-blink 1.1s step-start infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@media print {
+  #cursor { display: none !important; }
+}
+
 /* ── Scrollbar ────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -535,7 +557,7 @@ html, body {
     break-after: avoid;
   }
 
-  #hud, .nav-arrow, #overview, #kbd-hint {
+  #hud, .nav-arrow, #overview, #kbd-hint, #cursor {
     display: none !important;
   }
 }
@@ -554,6 +576,8 @@ ${slideHtml}
 
 <button class="nav-arrow nav-arrow--prev" id="btn-prev" title="Previous (←)">&#8592;</button>
 <button class="nav-arrow nav-arrow--next" id="btn-next" title="Next (→)">&#8594;</button>
+
+<div id="cursor"></div>
 
 <div id="overview" class="hidden"></div>
 
