@@ -1,4 +1,4 @@
-import type { Slide } from "./parser.js";
+import type { Slide, PositionedVideo } from "./parser.js";
 
 function escAttr(str: string): string {
   return str
@@ -8,38 +8,67 @@ function escAttr(str: string): string {
     .replace(/>/g, "&gt;");
 }
 
+function videoAttrs(v: PositionedVideo): string {
+  const a: string[] = [];
+  if (v.autoplay) a.push("autoplay");
+  if (v.loop) a.push("loop");
+  if (v.muted) a.push("muted");
+  if (v.controls) a.push("controls");
+  return a.length ? " " + a.join(" ") : "";
+}
+
+function renderMediaPanel(slide: Slide, side: "right" | "left"): string {
+  const img = side === "right" ? slide.rightImage : slide.leftImage;
+  const vid = side === "right" ? slide.rightVideo : slide.leftVideo;
+  if (vid) {
+    return `<div class="slide__image-panel" style="opacity:${vid.opacity}">
+          <video src="${escAttr(vid.src)}"${videoAttrs(vid)} playsinline>Your browser does not support video.</video>
+        </div>`;
+  }
+  if (img) {
+    return `<div class="slide__image-panel" style="opacity:${img.opacity}">
+          <img src="${escAttr(img.src)}" alt="${escAttr(img.alt)}" />
+        </div>`;
+  }
+  return "";
+}
+
 function renderSlide(slide: Slide, index: number): string {
+  const hasBg = !!(slide.bgImage || slide.bgVideo);
+
   const bgStyle = slide.bgImage
     ? ` style="--slide-bg-url: url('${escAttr(slide.bgImage.src)}'); --slide-bg-opacity: ${slide.bgImage.opacity};"`
     : "";
 
-  const bgLayer = slide.bgImage
-    ? `<div class="slide__bg" aria-hidden="true"></div>`
-    : "";
+  let bgLayer = "";
+  if (slide.bgImage) {
+    bgLayer = `<div class="slide__bg" aria-hidden="true"></div>`;
+  } else if (slide.bgVideo) {
+    bgLayer = `<video class="slide__bg-video" src="${escAttr(slide.bgVideo.src)}"${videoAttrs(slide.bgVideo)} playsinline style="opacity:${slide.bgVideo.opacity}"></video>`;
+  }
 
   let innerHtml: string;
 
-  if (slide.rightImage) {
+  const hasRight = !!(slide.rightImage || slide.rightVideo);
+  const hasLeft = !!(slide.leftImage || slide.leftVideo);
+
+  if (hasRight) {
     innerHtml = `
       <div class="slide__split">
         <div class="slide__content">${slide.html}</div>
-        <div class="slide__image-panel" style="opacity:${slide.rightImage.opacity}">
-          <img src="${escAttr(slide.rightImage.src)}" alt="${escAttr(slide.rightImage.alt)}" />
-        </div>
+        ${renderMediaPanel(slide, "right")}
       </div>`;
-  } else if (slide.leftImage) {
+  } else if (hasLeft) {
     innerHtml = `
       <div class="slide__split slide__split--left-image">
-        <div class="slide__image-panel" style="opacity:${slide.leftImage.opacity}">
-          <img src="${escAttr(slide.leftImage.src)}" alt="${escAttr(slide.leftImage.alt)}" />
-        </div>
+        ${renderMediaPanel(slide, "left")}
         <div class="slide__content">${slide.html}</div>
       </div>`;
   } else {
     innerHtml = `<div class="slide__content">${slide.html}</div>`;
   }
 
-  return `<div class="slide${slide.bgImage ? " slide--has-bg" : ""}" data-index="${index}"${bgStyle}>
+  return `<div class="slide${hasBg ? " slide--has-bg" : ""}" data-index="${index}"${bgStyle}>
   ${bgLayer}
   ${innerHtml}
 </div>`;
@@ -189,12 +218,23 @@ html, body {
   max-height: 80vh;
 }
 
-.slide__image-panel img {
+.slide__image-panel img,
+.slide__image-panel video {
   max-width: 100%;
   max-height: 78vh;
   object-fit: contain;
   border-radius: 6px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Background video layer ──────────────────────────────────────────── */
+.slide__bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
 /* ── Typography ───────────────────────────────────────────────────────── */
@@ -363,6 +403,15 @@ html, body {
 
 /* ── Inline images (no positioning) ──────────────────────────────────── */
 .slide__content img {
+  max-width: 100%;
+  max-height: 55vh;
+  border-radius: 6px;
+  display: block;
+  margin: 0.75rem auto;
+}
+
+/* ── Inline videos (no positioning) ─────────────────────────────────── */
+.slide__content video {
   max-width: 100%;
   max-height: 55vh;
   border-radius: 6px;
@@ -684,6 +733,10 @@ ${autoFullscreen ? `<div id="fs-hint">
       slideOut.classList.remove(exitClass, 'exit-left', 'exit-right');
       slideOut.removeEventListener('transitionend', cleanup);
     });
+
+    // Pause videos on exiting slide, play autoplay videos on entering slide
+    slideOut.querySelectorAll('video').forEach(function(v) { v.pause(); });
+    slideIn.querySelectorAll('video[autoplay]').forEach(function(v) { v.currentTime = 0; v.play().catch(function() {}); });
 
     cur = next;
     updateHud();
