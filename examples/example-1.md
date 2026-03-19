@@ -89,7 +89,7 @@ This slide has content on the left and an image panel on the right.
 - Opacity is controllable
 - Works great for diagrams, screenshots, charts
 
-![Logo](https://via.placeholder.com/600x400/1e1e2e/cba6f7?text=Right+Image "right opacity:0.9")
+![Slide preview](image.png "right opacity:0.9")
 
 ---
 

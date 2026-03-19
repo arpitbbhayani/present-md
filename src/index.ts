@@ -10,6 +10,16 @@ import { parseSlides } from "./parser.js";
 import { generateHtml } from "./generate.js";
 import puppeteer from "puppeteer";
 
+const c = {
+  reset:  "\x1b[0m",
+  bold:   "\x1b[1m",
+  dim:    "\x1b[2m",
+  cyan:   "\x1b[36m",
+  green:  "\x1b[32m",
+  yellow: "\x1b[33m",
+  magenta:"\x1b[35m",
+};
+
 const MIME: Record<string, string> = {
   ".html":  "text/html; charset=utf-8",
   ".css":   "text/css",
@@ -96,8 +106,7 @@ async function serve(
   });
 
   const url = `http://127.0.0.1:${port}`;
-  console.log(`\n  present  →  ${url}\n`);
-  console.log("  Press Ctrl+C to stop.\n");
+  console.log(`${c.bold}${c.magenta}present${c.reset} ${c.dim}→${c.reset} ${c.cyan}${c.bold}${url}${c.reset}  ${c.dim}(Ctrl+C to stop)${c.reset}`);
 
   await open(url);
 
@@ -135,7 +144,7 @@ async function exportPdf(
   await new Promise<void>((r) => server.listen(port, "127.0.0.1", r));
   const url = `http://127.0.0.1:${port}`;
 
-  process.stdout.write("  Generating PDF…");
+  process.stdout.write(`${c.yellow}generating PDF…${c.reset}`);
 
   const browser = await puppeteer.launch({ headless: true });
   try {
@@ -155,8 +164,8 @@ async function exportPdf(
     await new Promise<void>((r) => server.close(() => r()));
   }
 
-  process.stdout.write(` done\n`);
-  console.log(`  Exported ${slideCount} slide${slideCount !== 1 ? "s" : ""} → ${outputPath}`);
+  process.stdout.write(` ${c.green}done${c.reset}\n`);
+  console.log(`${c.dim}exported ${slideCount} slide${slideCount !== 1 ? "s" : ""} → ${outputPath}${c.reset}`);
 }
 
 // ── CLI ───────────────────────────────────────────────────────────────────
@@ -190,9 +199,15 @@ program
       process.exit(1);
     }
 
-    console.log(`  Loaded ${slides.length} slide${slides.length !== 1 ? "s" : ""} from ${basename(absPath)}`);
+    console.log(`${c.dim}${slides.length} slide${slides.length !== 1 ? "s" : ""} from ${basename(absPath)}${c.reset}`);
 
-    const html = generateHtml(slides, title);
+    const firstHeading = slides[0].html.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
+    const slideTitle = firstHeading
+      ? firstHeading[1].replace(/<[^>]+>/g, "").trim()
+      : "";
+    const resolvedTitle = slideTitle || title;
+
+    const html = generateHtml(slides, resolvedTitle);
 
     if (opts.pdf !== undefined && opts.pdf !== false) {
       const outputPath = typeof opts.pdf === "string"
@@ -227,7 +242,7 @@ program
         }
       });
       await new Promise<void>((r) => server.listen(port, "127.0.0.1", r));
-      console.log(`\n  present  →  http://127.0.0.1:${port}\n`);
+      console.log(`${c.bold}${c.magenta}present${c.reset} ${c.dim}→${c.reset} ${c.cyan}${c.bold}http://127.0.0.1:${port}${c.reset}  ${c.dim}(Ctrl+C to stop)${c.reset}`);
       await new Promise<void>(() => {});
     } else {
       await serve(html, baseDir, port);
