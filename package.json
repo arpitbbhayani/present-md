@@ -13,7 +13,8 @@
   "dependencies": {
     "commander": "^11.1.0",
     "marked": "^9.1.6",
-    "open": "^9.1.0"
+    "open": "^9.1.0",
+    "puppeteer": "^21.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

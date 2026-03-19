@@ -501,6 +501,44 @@ html, body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
+
+/* ── Print / PDF export ───────────────────────────────────────────────── */
+@media print {
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: var(--crust) !important;
+  }
+
+  #presentation {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: all !important;
+    transition: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .slide:last-of-type {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  #hud, .nav-arrow, #overview, #kbd-hint {
+    display: none !important;
+  }
+}
   </style>
 </head>
 <body>
