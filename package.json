@@ -1,0 +1,22 @@
+{
+  "name": "present",
+  "version": "1.0.0",
+  "description": "Browser-based markdown presentations for developers",
+  "type": "module",
+  "bin": {
+    "present": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "dev": "npx ts-node --esm src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "marked": "^9.1.6",
+    "open": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}
