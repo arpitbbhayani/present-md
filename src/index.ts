@@ -178,8 +178,9 @@ program
   .argument("<file>", "Markdown file to present")
   .option("-p, --port <number>", "Port to serve on", "7890")
   .option("--no-open", "Do not automatically open the browser")
+  .option("--fullscreen", "Auto-enter fullscreen on first interaction")
   .option("--pdf [output]", "Export presentation as PDF")
-  .action(async (file: string, opts: { port: string; open: boolean; pdf?: string | boolean }) => {
+  .action(async (file: string, opts: { port: string; open: boolean; fullscreen?: boolean; pdf?: string | boolean }) => {
     const absPath = resolve(process.cwd(), file);
     const baseDir = dirname(absPath);
     const title   = basename(absPath, extname(absPath));
@@ -207,7 +208,7 @@ program
       : "";
     const resolvedTitle = slideTitle || title;
 
-    const html = generateHtml(slides, resolvedTitle);
+    const html = generateHtml(slides, resolvedTitle, !!opts.fullscreen);
 
     if (opts.pdf !== undefined && opts.pdf !== false) {
       const outputPath = typeof opts.pdf === "string"

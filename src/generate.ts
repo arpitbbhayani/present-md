@@ -45,7 +45,7 @@ function renderSlide(slide: Slide, index: number): string {
 </div>`;
 }
 
-export function generateHtml(slides: Slide[], title: string): string {
+export function generateHtml(slides: Slide[], title: string, autoFullscreen = false): string {
   const slideHtml = slides.map((s, i) => renderSlide(s, i)).join("\n");
   const total = slides.length;
 
@@ -531,6 +531,42 @@ html, body {
   #cursor { display: none !important; }
 }
 
+/* ── Fullscreen hint ──────────────────────────────────────────────────── */
+#fs-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 17, 27, 0.82);
+  cursor: pointer;
+  transition: opacity 0.4s ease;
+}
+
+#fs-hint.hidden { opacity: 0; pointer-events: none; }
+
+#fs-hint__inner {
+  text-align: center;
+  color: var(--subtext1);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+  padding: 1.6rem 2.8rem;
+  background: var(--base);
+}
+
+#fs-hint__inner kbd {
+  display: inline-block;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  border-radius: 4px;
+  padding: 0.1em 0.5em;
+  font-family: inherit;
+  color: var(--mauve);
+}
+
 /* ── Scrollbar ────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -594,6 +630,10 @@ ${slideHtml}
 <div id="overview" class="hidden"></div>
 
 <div id="kbd-hint">← → navigate &nbsp;·&nbsp; O overview &nbsp;·&nbsp; F fullscreen &nbsp;·&nbsp; Home/End first/last</div>
+
+${autoFullscreen ? `<div id="fs-hint">
+  <div id="fs-hint__inner">Press any key or click to enter fullscreen</div>
+</div>` : ''}
 
 <script>
 (function () {
@@ -804,6 +844,21 @@ ${slideHtml}
       document.body.appendChild(img);
     });
   })();
+
+  // ── Auto-fullscreen ───────────────────────────────────────────────────
+  const fsHint = document.getElementById('fs-hint');
+  if (fsHint) {
+    function enterFullscreen() {
+      fsHint.classList.add('hidden');
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    fsHint.addEventListener('click', enterFullscreen, { once: true });
+    document.addEventListener('keydown', function fsKey(e) {
+      // Let the click handler own the 'f' key if hint is still visible
+      document.removeEventListener('keydown', fsKey);
+      enterFullscreen();
+    }, { once: true });
+  }
 
   // ── Init ─────────────────────────────────────────────────────────────
   slides[0].classList.add('is-active');

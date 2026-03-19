@@ -15,9 +15,10 @@ Then use `present-md` directly without `npx`.
 ## Usage
 
 ```bash
-npx present-md slides.md            # serve on :7890, auto-open browser
+npx present-md slides.md             # serve on :7890, auto-open browser
 npx present-md slides.md -p 3000    # custom port
 npx present-md slides.md --no-open  # serve only, print URL
+npx present-md slides.md --fullscreen  # prompt to enter fullscreen on load
 npx present-md slides.md --pdf      # export to PDF
 ```
 
