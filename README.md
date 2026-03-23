@@ -96,6 +96,26 @@ Images are positioned using the title attribute (the quoted string after the URL
 
 `bg` works well for title slides and section dividers — the text sits on top with full readability.
 
+### Video support
+
+Videos use the same image syntax — file extension (`.mp4`, `.webm`, `.mov`, `.ogg`) triggers video rendering:
+
+```markdown
+![](demo.mp4 "right autoplay loop muted")   # right-positioned, autoplaying
+![](bg.webm "bg loop muted")                # fullscreen background video
+![](clip.mp4 "left controls")               # left-positioned with controls
+![](inline.mp4)                             # inline with controls
+```
+
+| Directive    | Effect                                    |
+| ------------ | ----------------------------------------- |
+| `autoplay`   | Auto-play when slide becomes active       |
+| `loop`       | Loop video playback                       |
+| `muted`      | Mute audio (required for autoplay)        |
+| `controls`   | Show browser video controls               |
+
+Positioned videos (`right`, `left`, `bg`) default to `autoplay loop muted`. Inline videos default to `controls` only. Videos automatically pause when navigating away and resume when returning.
+
 ## Keyboard shortcuts
 
 | Key             | Action              |
