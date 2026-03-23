@@ -19,7 +19,6 @@ npx present-md slides.md             # serve on :7890, auto-open browser
 npx present-md slides.md -p 3000    # custom port
 npx present-md slides.md --no-open  # serve only, print URL
 npx present-md slides.md --fullscreen  # prompt to enter fullscreen on load
-npx present-md slides.md --pdf      # export to PDF
 ```
 
 ## Writing slides
@@ -117,7 +116,6 @@ Images are positioned using the title attribute (the quoted string after the URL
 - Progress bar + slide counter HUD
 - HTTP server (not `file://`) so local images load without CORS issues
 - Touch swipe support
-- PDF export via `--pdf`
 
 ## Examples
 
