@@ -252,7 +252,7 @@ html, body {
 .slide__content ol {
   font-size: clamp(0.95rem, 1.5vw, 1.25rem);
   line-height: 1.85;
-  padding-left: 1.8rem;
+  padding-left: 2.5rem;
   margin-bottom: 0.9rem;
   color: var(--text);
 }
@@ -271,6 +271,7 @@ html, body {
 .slide__content ol ul {
   margin-top: 0.25rem;
   margin-bottom: 0;
+  padding-left: 2rem;
 }
 
 /* ── Code ─────────────────────────────────────────────────────────────── */

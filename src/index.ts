@@ -8,7 +8,6 @@ import { Command } from "commander";
 import open from "open";
 import { parseSlides } from "./parser.js";
 import { generateHtml } from "./generate.js";
-import puppeteer from "puppeteer";
 
 const c = {
   reset:  "\x1b[0m",
@@ -39,7 +38,6 @@ const MIME: Record<string, string> = {
   ".woff":  "font/woff",
   ".woff2": "font/woff2",
   ".ttf":   "font/ttf",
-  ".pdf":   "application/pdf",
 };
 
 function getMime(filepath: string): string {
@@ -114,60 +112,6 @@ async function serve(
   await new Promise<void>(() => {});
 }
 
-async function exportPdf(
-  htmlContent: string,
-  baseDir: string,
-  outputPath: string,
-  slideCount: number
-): Promise<void> {
-  const port = await findFreePort(0);
-  const server = createServer(async (req, res) => {
-    const rawUrl = req.url ?? "/";
-    const decoded = decodeURIComponent(rawUrl.split("?")[0]);
-    if (decoded === "/" || decoded === "/index.html") {
-      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      res.end(htmlContent);
-      return;
-    }
-    const filePath = resolve(baseDir, decoded.replace(/^\//, ""));
-    if (!filePath.startsWith(baseDir)) { res.writeHead(403); res.end(); return; }
-    try {
-      const data = await readFile(filePath);
-      res.writeHead(200, { "Content-Type": getMime(filePath) });
-      res.end(data);
-    } catch {
-      res.writeHead(404);
-      res.end("Not found");
-    }
-  });
-
-  await new Promise<void>((r) => server.listen(port, "127.0.0.1", r));
-  const url = `http://127.0.0.1:${port}`;
-
-  process.stdout.write(`${c.yellow}generating PDF…${c.reset}`);
-
-  const browser = await puppeteer.launch({ headless: true });
-  try {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720 });
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 30_000 });
-    // Wait for fonts to finish loading
-    await page.evaluate(() => document.fonts.ready);
-    await page.pdf({
-      path: outputPath,
-      width: "1280px",
-      height: "720px",
-      printBackground: true,
-    });
-  } finally {
-    await browser.close();
-    await new Promise<void>((r) => server.close(() => r()));
-  }
-
-  process.stdout.write(` ${c.green}done${c.reset}\n`);
-  console.log(`${c.dim}exported ${slideCount} slide${slideCount !== 1 ? "s" : ""} → ${outputPath}${c.reset}`);
-}
-
 // ── CLI ───────────────────────────────────────────────────────────────────
 const program = new Command();
 
@@ -179,8 +123,7 @@ program
   .option("-p, --port <number>", "Port to serve on", "7890")
   .option("--no-open", "Do not automatically open the browser")
   .option("--fullscreen", "Auto-enter fullscreen on first interaction")
-  .option("--pdf [output]", "Export presentation as PDF")
-  .action(async (file: string, opts: { port: string; open: boolean; fullscreen?: boolean; pdf?: string | boolean }) => {
+  .action(async (file: string, opts: { port: string; open: boolean; fullscreen?: boolean }) => {
     const absPath = resolve(process.cwd(), file);
     const baseDir = dirname(absPath);
     const title   = basename(absPath, extname(absPath));
@@ -209,14 +152,6 @@ program
     const resolvedTitle = slideTitle || title;
 
     const html = generateHtml(slides, resolvedTitle, !!opts.fullscreen);
-
-    if (opts.pdf !== undefined && opts.pdf !== false) {
-      const outputPath = typeof opts.pdf === "string"
-        ? resolve(process.cwd(), opts.pdf)
-        : resolve(process.cwd(), basename(absPath, extname(absPath)) + ".pdf");
-      await exportPdf(html, baseDir, outputPath, slides.length);
-      process.exit(0);
-    }
 
     const preferredPort = parseInt(opts.port, 10);
     const port = await findFreePort(preferredPort);
