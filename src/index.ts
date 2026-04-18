@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import { Command } from "commander";
 import open from "open";
 import { parseSlides } from "./parser.js";
-import { generateHtml } from "./generate.js";
+import { generateHtml, type ThemeName } from "./generate.js";
 
 const c = {
   reset:  "\x1b[0m",
@@ -123,7 +123,8 @@ program
   .option("-p, --port <number>", "Port to serve on", "7890")
   .option("--no-open", "Do not automatically open the browser")
   .option("--fullscreen", "Auto-enter fullscreen on first interaction")
-  .action(async (file: string, opts: { port: string; open: boolean; fullscreen?: boolean }) => {
+  .option("--theme <name>", "Color theme: dark or light", "dark")
+  .action(async (file: string, opts: { port: string; open: boolean; fullscreen?: boolean; theme: string }) => {
     const absPath = resolve(process.cwd(), file);
     const baseDir = dirname(absPath);
     const title   = basename(absPath, extname(absPath));
@@ -151,7 +152,8 @@ program
       : "";
     const resolvedTitle = slideTitle || title;
 
-    const html = generateHtml(slides, resolvedTitle, !!opts.fullscreen);
+    const theme = (opts.theme === "light" ? "light" : "dark") as ThemeName;
+    const html = generateHtml(slides, resolvedTitle, !!opts.fullscreen, theme);
 
     const preferredPort = parseInt(opts.port, 10);
     const port = await findFreePort(preferredPort);
