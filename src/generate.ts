@@ -1,5 +1,81 @@
 import type { Slide } from "./parser.js";
 
+export type ThemeName = "dark" | "light";
+
+interface ThemeVars {
+  crust: string; mantle: string; base: string;
+  surface0: string; surface1: string; surface2: string;
+  overlay0: string; overlay1: string;
+  subtext0: string; subtext1: string; text: string;
+  lavender: string; blue: string; sapphire: string;
+  sky: string; teal: string; green: string;
+  yellow: string; peach: string; red: string;
+  mauve: string; pink: string;
+  mauveAlpha: string; surface0Alpha: string; crustOverlay: string;
+  hljs: string;
+}
+
+const THEMES: Record<ThemeName, ThemeVars> = {
+  dark: {
+    // Catppuccin Mocha
+    crust:    "#11111b",
+    mantle:   "#181825",
+    base:     "#1e1e2e",
+    surface0: "#313244",
+    surface1: "#45475a",
+    surface2: "#585b70",
+    overlay0: "#6c7086",
+    overlay1: "#7f849c",
+    subtext0: "#a6adc8",
+    subtext1: "#bac2de",
+    text:     "#cdd6f4",
+    lavender: "#b4befe",
+    blue:     "#89b4fa",
+    sapphire: "#74c7ec",
+    sky:      "#89dceb",
+    teal:     "#94e2d5",
+    green:    "#a6e3a1",
+    yellow:   "#f9e2af",
+    peach:    "#fab387",
+    red:      "#f38ba8",
+    mauve:    "#cba6f7",
+    pink:     "#f5c2e7",
+    mauveAlpha:    "rgba(203, 166, 247, 0.06)",
+    surface0Alpha: "rgba(49, 50, 68, 0.3)",
+    crustOverlay:  "rgba(17, 17, 27, 0.82)",
+    hljs: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css",
+  },
+  light: {
+    // Catppuccin Latte
+    crust:    "#dce0e8",
+    mantle:   "#e6e9ef",
+    base:     "#eff1f5",
+    surface0: "#ccd0da",
+    surface1: "#bcc0cc",
+    surface2: "#acb0be",
+    overlay0: "#9ca0b0",
+    overlay1: "#8c8fa1",
+    subtext0: "#6c6f85",
+    subtext1: "#5c5f77",
+    text:     "#4c4f69",
+    lavender: "#7287fd",
+    blue:     "#1e66f5",
+    sapphire: "#209fb5",
+    sky:      "#04a5e5",
+    teal:     "#179299",
+    green:    "#40a02b",
+    yellow:   "#df8e1d",
+    peach:    "#fe640b",
+    red:      "#d20f39",
+    mauve:    "#8839ef",
+    pink:     "#ea76cb",
+    mauveAlpha:    "rgba(136, 57, 239, 0.06)",
+    surface0Alpha: "rgba(204, 208, 218, 0.3)",
+    crustOverlay:  "rgba(220, 224, 232, 0.88)",
+    hljs: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css",
+  },
+};
+
 function escAttr(str: string): string {
   return str
     .replace(/&/g, "&amp;")
@@ -45,12 +121,13 @@ function renderSlide(slide: Slide, index: number): string {
 </div>`;
 }
 
-export function generateHtml(slides: Slide[], title: string, autoFullscreen = false): string {
+export function generateHtml(slides: Slide[], title: string, autoFullscreen = false, theme: ThemeName = "dark"): string {
+  const t = THEMES[theme];
   const slideHtml = slides.map((s, i) => renderSlide(s, i)).join("\n");
   const total = slides.length;
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="${theme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,36 +135,38 @@ export function generateHtml(slides: Slide[], title: string, autoFullscreen = fa
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+  <link rel="stylesheet" href="${t.hljs}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
 /* ── Reset & base ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Catppuccin Mocha */
-  --crust:    #11111b;
-  --mantle:   #181825;
-  --base:     #1e1e2e;
-  --surface0: #313244;
-  --surface1: #45475a;
-  --surface2: #585b70;
-  --overlay0: #6c7086;
-  --overlay1: #7f849c;
-  --subtext0: #a6adc8;
-  --subtext1: #bac2de;
-  --text:     #cdd6f4;
-  --lavender: #b4befe;
-  --blue:     #89b4fa;
-  --sapphire: #74c7ec;
-  --sky:      #89dceb;
-  --teal:     #94e2d5;
-  --green:    #a6e3a1;
-  --yellow:   #f9e2af;
-  --peach:    #fab387;
-  --red:      #f38ba8;
-  --mauve:    #cba6f7;
-  --pink:     #f5c2e7;
+  --crust:    ${t.crust};
+  --mantle:   ${t.mantle};
+  --base:     ${t.base};
+  --surface0: ${t.surface0};
+  --surface1: ${t.surface1};
+  --surface2: ${t.surface2};
+  --overlay0: ${t.overlay0};
+  --overlay1: ${t.overlay1};
+  --subtext0: ${t.subtext0};
+  --subtext1: ${t.subtext1};
+  --text:     ${t.text};
+  --lavender: ${t.lavender};
+  --blue:     ${t.blue};
+  --sapphire: ${t.sapphire};
+  --sky:      ${t.sky};
+  --teal:     ${t.teal};
+  --green:    ${t.green};
+  --yellow:   ${t.yellow};
+  --peach:    ${t.peach};
+  --red:      ${t.red};
+  --mauve:    ${t.mauve};
+  --pink:     ${t.pink};
+  --mauve-alpha:    ${t.mauveAlpha};
+  --surface0-alpha: ${t.surface0Alpha};
+  --crust-overlay:  ${t.crustOverlay};
 }
 
 html, body {
@@ -310,7 +389,7 @@ html, body {
   border-left: 3px solid var(--mauve);
   padding: 0.6rem 1.5rem;
   margin: 1rem 0;
-  background: rgba(203, 166, 247, 0.06);
+  background: var(--mauve-alpha);
   border-radius: 0 6px 6px 0;
   color: var(--subtext1);
   font-size: clamp(0.95rem, 1.4vw, 1.2rem);
@@ -347,7 +426,7 @@ html, body {
 }
 
 .slide__content tr:nth-child(even) td {
-  background: rgba(49, 50, 68, 0.3);
+  background: var(--surface0-alpha);
 }
 
 /* ── Links ────────────────────────────────────────────────────────────── */
@@ -540,7 +619,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(17, 17, 27, 0.82);
+  background: var(--crust-overlay);
   cursor: pointer;
   transition: opacity 0.4s ease;
 }
