@@ -654,10 +654,17 @@ html, body {
 
 /* ── Print / PDF export ───────────────────────────────────────────────── */
 @media print {
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+
   html, body {
     height: auto !important;
     overflow: visible !important;
     background: var(--crust) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   #presentation {
@@ -678,11 +685,6 @@ html, body {
     height: 100vh !important;
     page-break-after: always;
     break-after: page;
-  }
-
-  .slide:last-of-type {
-    page-break-after: avoid;
-    break-after: avoid;
   }
 
   #hud, .nav-arrow, #overview, #kbd-hint, #cursor {
