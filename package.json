@@ -1,6 +1,6 @@
 {
   "name": "present-md",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Browser-based markdown presentations for developers",
   "type": "module",
   "bin": {
