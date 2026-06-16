@@ -19,8 +19,11 @@ npx present-md slides.md             # serve on :7890, auto-open browser
 npx present-md slides.md -p 3000    # custom port
 npx present-md slides.md --no-open  # serve only, print URL
 npx present-md slides.md --fullscreen  # prompt to enter fullscreen on load
-npx present-md slides.md --pdf      # export to PDF
+npx present-md slides.md --pdf      # export to slides.pdf next to the markdown file
+npx present-md slides.md --pdf deck # export to ./deck.pdf
 ```
+
+`--pdf` uses a local Chromium-based browser in headless mode. `present-md` will auto-detect Chrome, Chromium, Brave, or Edge; you can override that with `PRESENT_MD_PDF_BROWSER=/path/to/browser`.
 
 ## Writing slides
 
